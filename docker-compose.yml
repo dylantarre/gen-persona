@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  persona-generator:
+    build: .
+    ports:
+      - "9350:9350"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9350/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  huggingface-cache:
