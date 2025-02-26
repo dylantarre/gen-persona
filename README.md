@@ -56,13 +56,14 @@ docker-compose up -d
 
 The service runs on port 9350 and exposes two endpoints:
 
-### Generate Persona
+### Generate a UX Persona
 
 **Endpoint:** `POST http://localhost:9350/generate`
 
 **Headers:**
 ```
 Content-Type: application/json
+X-API-Key: your_api_secret_key
 ```
 
 **Request Body:**
@@ -76,18 +77,17 @@ Content-Type: application/json
 ```bash
 curl -X POST http://localhost:9350/generate \
   -H "Content-Type: application/json" \
-  -d '{
-    "base_persona": "A 28-year-old software engineer who loves rock climbing and building side projects in their spare time. They are passionate about clean code and sustainable development practices."
-  }'
+  -H "X-API-Key: your_api_secret_key" \
+  -d '{"base_persona": "A 28-year-old software engineer who loves rock climbing and building side projects in their spare time. They are passionate about clean code and sustainable development practices."}'
 ```
 
-### Health Check
+### Check API Health
 
 **Endpoint:** `GET http://localhost:9350/health`
 
 **Example:**
 ```bash
-curl http://localhost:9350/health
+curl -X GET http://localhost:9350/health
 ```
 
 ## Deployment with Cloudflare Tunnel
@@ -154,6 +154,7 @@ curl -X POST https://gen-persona.lg.media/generate \
   -H "CF-Access-Client-Id: YOUR_ACCESS_CLIENT_ID" \
   -H "CF-Access-Client-Secret: YOUR_ACCESS_CLIENT_SECRET" \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: your_api_secret_key" \
   -d '{"base_persona": "A 28-year-old software engineer who loves rock climbing"}'
 ```
 
@@ -191,7 +192,8 @@ import requests
 def generate_persona(base_persona):
     response = requests.post(
         "http://localhost:9350/generate",
-        json={"base_persona": base_persona}
+        json={"base_persona": base_persona},
+        headers={"X-API-Key": "your_api_secret_key"}
     )
     return response.json()
 ```
@@ -202,7 +204,8 @@ async function generatePersona(basePersona) {
     const response = await fetch('http://localhost:9350/generate', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-API-Key': 'your_api_secret_key'
         },
         body: JSON.stringify({ base_persona: basePersona })
     });
@@ -223,13 +226,64 @@ Always implement proper error handling in your applications:
 try:
     response = requests.post(
         "http://localhost:9350/generate",
-        json={"base_persona": base_persona}
+        json={"base_persona": base_persona},
+        headers={"X-API-Key": "your_api_secret_key"}
     )
     response.raise_for_status()
     persona = response.json()
 except requests.exceptions.RequestException as e:
     print(f"Error generating persona: {e}")
 ```
+
+## Security Considerations
+
+This API implements multiple layers of security that can be used depending on your deployment scenario:
+
+### 1. API Key Authentication (Built-in)
+
+The service requires an API key for all requests to the `/generate` endpoint. This key is defined in your environment variables:
+
+```
+API_SECRET_KEY=your_secret_key_here
+```
+
+All requests must include this key in the `X-API-Key` header:
+
+```bash
+curl -X POST http://localhost:9350/generate \
+  -H "X-API-Key: your_secret_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"base_persona": "..."}'
+```
+
+### 2. Network Security Options
+
+Depending on your deployment scenario, consider these additional security layers:
+
+#### For Internal Networks
+
+- **Docker Network Isolation**: When deploying with other containers, use Docker's network isolation to limit access to only the containers that need it.
+- **Reverse Proxy**: Place the service behind a reverse proxy like Nginx or Traefik to add TLS and additional authentication.
+- **Firewall Rules**: Configure firewall rules on your host to restrict access to the service's port.
+
+#### For Public Access
+
+- **Cloudflare Tunnel + Access**: As described in the Deployment section, use Cloudflare Tunnel with Access policies to restrict by IP address.
+- **VPN**: Require VPN access to your network before the service can be reached.
+- **TLS**: Always use HTTPS for any publicly accessible endpoint.
+
+### 3. Monitoring and Rate Limiting
+
+- Monitor API usage for unusual patterns
+- Consider implementing rate limiting for production deployments
+- Regularly rotate your API keys
+
+### Security Recommendations
+
+1. **Never expose the service directly to the internet without authentication**
+2. **Use a strong, randomly generated API key**
+3. **Rotate your API keys periodically**
+4. **Monitor logs for unauthorized access attempts**
 
 ## Monitoring
 
