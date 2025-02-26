@@ -54,7 +54,7 @@ docker-compose up -d
 
 ## API Usage
 
-The service runs on port 9350 and exposes two endpoints:
+The service runs on port 9350 and exposes the following endpoints:
 
 ### Generate a UX Persona
 
@@ -73,13 +73,22 @@ X-API-Key: your_api_secret_key
 }
 ```
 
+### Get a Random Persona
+
+**Endpoint:** `GET http://localhost:9350/random-persona`
+
+**Headers:**
+```
+X-API-Key: your_api_secret_key
+```
+
 **Example Request:**
 ```bash
-curl -X POST http://localhost:9350/generate \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: your_api_secret_key" \
-  -d '{"base_persona": "A 28-year-old software engineer who loves rock climbing and building side projects in their spare time. They are passionate about clean code and sustainable development practices."}'
+curl -X GET http://localhost:9350/random-persona \
+  -H "X-API-Key: your_api_secret_key"
 ```
+
+This endpoint returns a random persona from the PersonaHub dataset that you can use as input for the `/generate` endpoint.
 
 ### Check API Health
 

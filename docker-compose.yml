@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   persona-generator:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: persona-generator:latest
     ports:
       - "9350:9350"
     environment:
