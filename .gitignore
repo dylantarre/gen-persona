@@ -37,10 +37,6 @@ ENV/
 # Docker
 .docker/
 
-# Hugging Face cache
-.cache/
-.huggingface/
-
 # OS
 .DS_Store
 Thumbs.db
