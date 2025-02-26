@@ -5,6 +5,7 @@ import uvicorn
 import os
 import random
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
 
@@ -15,6 +16,9 @@ generator = PersonaGenerator()
 personas = generator.load_personas()
 if not personas:
     raise Exception("Failed to load PersonaHub personas")
+
+# After loading personas
+logging.info(f"Loaded {len(personas) if personas else 0} personas")
 
 # Get API key from environment variable
 API_KEY = os.getenv("API_SECRET_KEY", "default-dev-key-change-me")
@@ -56,6 +60,10 @@ async def get_random_persona(api_key: str = Depends(verify_api_key)):
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
+@app.get("/version")
+async def version():
+    return {"version": "2.0", "updated": True}
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=9350, reload=True)
