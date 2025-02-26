@@ -5,14 +5,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: persona-generator:latest
+    image: dylantarre/gen-persona:latest
     ports:
       - "9350:9350"
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - API_SECRET_KEY=${API_SECRET_KEY:-default-dev-key-change-me}
-    volumes:
-      - huggingface-cache:/root/.cache/huggingface
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9350/health"]
       interval: 30s
@@ -20,6 +18,3 @@ services:
       retries: 3
       start_period: 5s
     restart: unless-stopped
-
-volumes:
-  huggingface-cache:
