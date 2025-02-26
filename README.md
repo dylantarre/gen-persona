@@ -342,66 +342,69 @@ The `/generate` and `/random-ux-persona` endpoints return a JSON object with the
 
 ```json
 {
-  "name": "Full Name",
-  "demographics": {
-    "age": 30,
-    "gender": "Gender",
-    "occupation": {
-      "title": "Job Title",
-      "responsibilities": ["Responsibility 1", "Responsibility 2"]
+    "name": "Full Name",
+    "demographics": {
+        "age": "number",
+        "gender": "string",
+        "occupation": {
+            "title": "string",
+            "responsibilities": ["string"]
+        },
+        "education": {
+            "level": "string",
+            "field": "string"
+        },
+        "location": {
+            "city_region": "string",
+            "living_situation": "string"
+        },
+        "income": {
+            "level": "string",
+            "financial_situation": "string"
+        },
+        "family_status": "string"
     },
-    "education": {
-      "level": "Education Level",
-      "field": "Field of Study"
+    "goals": {
+        "professional": ["string"],
+        "personal": ["string"],
+        "short_term": ["string"],
+        "long_term": ["string"]
     },
-    "location": {
-      "city": "City/Region",
-      "living_situation": "Living Situation"
+    "frustrations": {
+        "daily_workflow": ["string"],
+        "technology": ["string"],
+        "time_management": ["string"],
+        "communication": ["string"],
+        "industry_specific": ["string"]
     },
-    "income": "Income Level",
-    "family_status": "Family Status"
-  },
-  "goals": {
-    "professional": ["Professional Goal 1", "Professional Goal 2"],
-    "personal": ["Personal Goal 1", "Personal Goal 2"],
-    "short_term": ["Short-term Goal 1", "Short-term Goal 2"],
-    "long_term": ["Long-term Goal 1", "Long-term Goal 2"]
-  },
-  "frustrations": {
-    "workflow": ["Workflow Pain Point 1", "Workflow Pain Point 2"],
-    "technology": ["Technology Challenge 1", "Technology Challenge 2"],
-    "time_management": ["Time Management Issue 1", "Time Management Issue 2"],
-    "communication": ["Communication Barrier 1", "Communication Barrier 2"],
-    "industry_specific": ["Industry Frustration 1", "Industry Frustration 2"]
-  },
-  "behaviors": {
-    "daily_routine": ["Routine Item 1", "Routine Item 2"],
-    "technology_usage": ["Technology Usage Pattern 1", "Technology Usage Pattern 2"],
-    "social_media": ["Social Media Behavior 1", "Social Media Behavior 2"],
-    "shopping_habits": ["Shopping Habit 1", "Shopping Habit 2"],
-    "decision_making": ["Decision Process 1", "Decision Process 2"],
-    "information_seeking": ["Information Seeking Behavior 1", "Information Seeking Behavior 2"]
-  },
-  "motivations": {
-    "values": ["Value 1", "Value 2"],
-    "professional_motivators": ["Professional Motivator 1", "Professional Motivator 2"],
-    "personal_drivers": ["Personal Driver 1", "Personal Driver 2"],
-    "success_metrics": ["Success Metric 1", "Success Metric 2"]
-  },
-  "tech_proficiency": {
-    "devices": ["Device 1", "Device 2"],
-    "software": ["Software 1", "Software 2"],
-    "comfort_level": "Comfort Level Description",
-    "learning_style": "Learning Style Description"
-  },
-  "preferred_channels": {
-    "communication": ["Communication Channel 1", "Communication Channel 2"],
-    "media_consumption": ["Media Channel 1", "Media Channel 2"],
-    "product_discovery": ["Discovery Channel 1", "Discovery Channel 2"],
-    "social_networks": ["Social Network 1", "Social Network 2"]
-  },
-  "day_in_life": "A brief narrative of their typical day from morning to evening.",
-  "quote": "A representative quote that captures their attitude or perspective."
+    "behaviors": {
+        "daily_routine": ["string"],
+        "technology_usage": ["string"],
+        "social_media": ["string"],
+        "shopping_habits": ["string"],
+        "decision_making": ["string"],
+        "information_seeking": ["string"]
+    },
+    "motivations": {
+        "values_beliefs": ["string"],
+        "professional_motivators": ["string"],
+        "personal_drivers": ["string"],
+        "success_vision": "string"
+    },
+    "technological_proficiency": {
+        "devices": ["string"],
+        "software_apps": ["string"],
+        "comfort_level": "string",
+        "learning_style": "string"
+    },
+    "preferred_channels": {
+        "communication": ["string"],
+        "media_consumption": ["string"],
+        "product_discovery": ["string"],
+        "social_networks": ["string"]
+    },
+    "day_in_life": "string",
+    "quote": "string"
 }
 ```
 
