@@ -1,1 +1,16 @@
- 
+name: Deploy to Portainer
+
+on:
+  push:
+    branches: [ main ]  # Adjust branch name as needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Trigger Portainer webhook
+        run: |
+          curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }} 
