@@ -90,6 +90,87 @@ curl -X POST http://localhost:9350/generate \
 curl http://localhost:9350/health
 ```
 
+## Deployment with Cloudflare Tunnel
+
+To deploy this service securely with IP-based access restrictions using Cloudflare Tunnel:
+
+### 1. Set Up Cloudflare Tunnel
+
+1. Install `cloudflared` on your server:
+   ```bash
+   # On Ubuntu/Debian
+   curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+   sudo dpkg -i cloudflared.deb
+   
+   # On macOS
+   brew install cloudflare/cloudflare/cloudflared
+   ```
+
+2. Authenticate with Cloudflare:
+   ```bash
+   cloudflared tunnel login
+   ```
+
+3. Create a tunnel:
+   ```bash
+   cloudflared tunnel create gen-persona
+   ```
+
+4. Configure the tunnel by creating a config file at `~/.cloudflared/config.yml`:
+   ```yaml
+   tunnel: <TUNNEL_ID>
+   credentials-file: /path/to/.cloudflared/<TUNNEL_ID>.json
+   
+   ingress:
+     - hostname: gen-persona.lg.media
+       service: http://localhost:9350
+     - service: http_status:404
+   ```
+
+5. Create a DNS record for your domain:
+   ```bash
+   cloudflared tunnel route dns <TUNNEL_ID> gen-persona.lg.media
+   ```
+
+6. Start the tunnel:
+   ```bash
+   cloudflared tunnel run
+   ```
+
+### 2. IP Restriction Options
+
+#### Option A: Cloudflare Access (Recommended)
+
+1. Go to the Cloudflare Zero Trust dashboard
+2. Navigate to Access → Applications
+3. Create a new application for `gen-persona.lg.media`
+4. Create an Access policy with an "Allow" rule using the "IP Address" selector
+5. Add your allowed IP addresses or CIDR ranges
+
+#### Option B: Application-Level Filtering
+
+Update the `ALLOWED_IPS` list in `app.py` with your allowed IP addresses:
+
+```python
+ALLOWED_IPS = [
+    "203.0.113.1",  # Replace with your actual IP
+    "203.0.113.2",  # Another allowed IP
+    "192.168.1.0/24",  # CIDR notation for IP ranges
+]
+```
+
+### 3. Making API Requests
+
+When using Cloudflare Access, include the CF Access token in your requests:
+
+```bash
+curl -X POST https://gen-persona.lg.media/generate \
+  -H "CF-Access-Client-Id: YOUR_ACCESS_CLIENT_ID" \
+  -H "CF-Access-Client-Secret: YOUR_ACCESS_CLIENT_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"base_persona": "A 28-year-old software engineer who loves rock climbing"}'
+```
+
 ## Best Practices for Using the Service
 
 ### Writing Effective Base Personas
