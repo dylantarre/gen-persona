@@ -3,12 +3,18 @@ from pydantic import BaseModel
 from persona_generator import PersonaGenerator
 import uvicorn
 import os
+import random
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = FastAPI(title="Persona Generator API")
 generator = PersonaGenerator()
+
+# Load personas at startup
+personas = generator.load_personas()
+if not personas:
+    raise Exception("Failed to load PersonaHub personas")
 
 # Get API key from environment variable
 API_KEY = os.getenv("API_SECRET_KEY", "default-dev-key-change-me")
@@ -24,6 +30,9 @@ class PersonaRequest(BaseModel):
 class PersonaResponse(BaseModel):
     ux_persona: str
 
+class RandomPersonaResponse(BaseModel):
+    base_persona: str
+
 @app.post("/generate", response_model=PersonaResponse)
 async def generate_persona(request: PersonaRequest, api_key: str = Depends(verify_api_key)):
     try:
@@ -31,6 +40,16 @@ async def generate_persona(request: PersonaRequest, api_key: str = Depends(verif
         if not ux_persona:
             raise HTTPException(status_code=500, detail="Failed to generate persona")
         return {"ux_persona": ux_persona}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/random-persona", response_model=RandomPersonaResponse)
+async def get_random_persona(api_key: str = Depends(verify_api_key)):
+    try:
+        if not personas or len(personas) == 0:
+            raise HTTPException(status_code=500, detail="No personas available")
+        random_persona = random.choice(personas)
+        return {"base_persona": random_persona}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
