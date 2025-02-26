@@ -17,26 +17,23 @@ A powerful API service that generates detailed UX personas using Google's Gemini
 - Easy deployment with Docker and Portainer
 - RESTful API interface
 
-## Setup
+## Installation
 
-### Local Development
+### Using Docker Hub
 
-1. Install dependencies:
+The easiest way to get started is to pull the pre-built Docker image from Docker Hub:
+
 ```bash
-pip install -r requirements.txt
+docker pull dylantarre/gen-persona:latest
 ```
 
-2. Create a `.env` file:
+Then run it with:
+
 ```bash
-cp .env.example .env
+docker run -p 9350:9350 -e OPENROUTER_API_KEY=your_api_key dylantarre/gen-persona:latest
 ```
 
-3. Add your OpenRouter API key to the `.env` file:
-```
-OPENROUTER_API_KEY=your_api_key_here
-```
-
-### Docker Deployment
+### Using Docker Compose
 
 1. Make sure you have Docker and Docker Compose installed
 
