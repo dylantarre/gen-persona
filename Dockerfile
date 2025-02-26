@@ -1,5 +1,8 @@
 FROM python:3.11-slim
 
+# Set the platform explicitly
+ARG TARGETPLATFORM=linux/amd64
+
 WORKDIR /app
 
 # Install system dependencies
@@ -13,6 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
+
+# Make sure persona.jsonl is explicitly copied
+COPY persona.jsonl /app/persona.jsonl
 
 # Create a non-root user
 RUN useradd -m appuser && chown -R appuser:appuser /app
