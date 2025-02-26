@@ -247,6 +247,13 @@ The service requires an API key for all requests to the `/generate` endpoint. Th
 API_SECRET_KEY=your_secret_key_here
 ```
 
+To generate a secure random API key, use this command:
+
+```bash
+openssl rand -hex 32
+# Example output: d7342c173c86ec331b94e5f28b600412a992a9addd3a2a0fc3efcc87450871a1
+```
+
 All requests must include this key in the `X-API-Key` header:
 
 ```bash
