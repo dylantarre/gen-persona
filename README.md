@@ -137,27 +137,13 @@ To deploy this service securely with IP-based access restrictions using Cloudfla
    cloudflared tunnel run
    ```
 
-### 2. IP Restriction Options
-
-#### Option A: Cloudflare Access (Recommended)
+### 2. IP Restriction with Cloudflare Access
 
 1. Go to the Cloudflare Zero Trust dashboard
 2. Navigate to Access → Applications
 3. Create a new application for `gen-persona.lg.media`
 4. Create an Access policy with an "Allow" rule using the "IP Address" selector
 5. Add your allowed IP addresses or CIDR ranges
-
-#### Option B: Application-Level Filtering
-
-Update the `ALLOWED_IPS` list in `app.py` with your allowed IP addresses:
-
-```python
-ALLOWED_IPS = [
-    "203.0.113.1",  # Replace with your actual IP
-    "203.0.113.2",  # Another allowed IP
-    "192.168.1.0/24",  # CIDR notation for IP ranges
-]
-```
 
 ### 3. Making API Requests
 
