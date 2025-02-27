@@ -55,11 +55,11 @@ docker-compose up -d
 
 ## API Usage
 
-The service runs on port 9350 and exposes the following endpoints:
+The service is available at `https://gen.kolidos.com` and exposes the following endpoints:
 
 ### Generate a UX Persona
 
-**Endpoint:** `POST http://localhost:9350/generate`
+**Endpoint:** `POST https://gen.kolidos.com/generate`
 
 **Headers:**
 ```
@@ -74,9 +74,17 @@ X-API-Key: your_api_secret_key
 }
 ```
 
+**Example Request:**
+```bash
+curl -X POST "https://gen.kolidos.com/generate" \
+     -H "Content-Type: application/json" \
+     -H "X-API-Key: your_api_secret_key" \
+     -d '{"base_persona": "A 28-year-old software engineer who loves building side projects."}'
+```
+
 ### Get a Random Persona
 
-**Endpoint:** `GET http://localhost:9350/random-persona`
+**Endpoint:** `GET https://gen.kolidos.com/random-persona`
 
 **Headers:**
 ```
@@ -85,19 +93,32 @@ X-API-Key: your_api_secret_key
 
 **Example Request:**
 ```bash
-curl -X GET http://localhost:9350/random-persona \
-  -H "X-API-Key: your_api_secret_key"
+curl -X GET "https://gen.kolidos.com/random-persona" \
+     -H "X-API-Key: your_api_secret_key"
 ```
 
-This endpoint returns a random persona from the PersonaHub dataset that you can use as input for the `/generate` endpoint.
+### Get a Random UX Persona (Combined Endpoint)
+
+**Endpoint:** `GET https://gen.kolidos.com/random-ux-persona`
+
+**Headers:**
+```
+X-API-Key: your_api_secret_key
+```
+
+**Example Request:**
+```bash
+curl -X GET "https://gen.kolidos.com/random-ux-persona" \
+     -H "X-API-Key: your_api_secret_key"
+```
 
 ### Check API Health
 
-**Endpoint:** `GET http://localhost:9350/health`
+**Endpoint:** `GET https://gen.kolidos.com/health`
 
-**Example:**
+**Example Request:**
 ```bash
-curl -X GET http://localhost:9350/health
+curl -X GET "https://gen.kolidos.com/health"
 ```
 
 ## Deployment with Cloudflare Tunnel
