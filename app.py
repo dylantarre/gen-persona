@@ -39,6 +39,10 @@ class PersonaResponse(BaseModel):
 class RandomPersonaResponse(BaseModel):
     base_persona: str
 
+class NameResponse(BaseModel):
+    name: str
+    base_persona: str
+
 @app.post("/generate", response_model=PersonaResponse)
 async def generate_persona(request: PersonaRequest, api_key: str = Depends(verify_api_key)):
     try:
@@ -77,6 +81,44 @@ async def get_random_ux_persona(api_key: str = Depends(verify_api_key)):
         return {"ux_persona": ux_persona}
     except Exception as e:
         logging.error(f"Error generating random UX persona: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/random-name", response_model=NameResponse)
+async def get_random_name(api_key: str = Depends(verify_api_key)):
+    """Generate a random name based on a random base persona"""
+    try:
+        if not personas or len(personas) == 0:
+            raise HTTPException(status_code=503, detail="No personas available")
+        
+        random_persona = random.choice(personas)
+        name_response = generator.generate_name(random_persona)
+        
+        if not name_response or 'name' not in name_response:
+            raise HTTPException(status_code=500, detail="Failed to generate name")
+            
+        return name_response
+    except Exception as e:
+        logging.error(f"Error generating random name: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/expand-persona", response_model=PersonaResponse)
+async def expand_persona(request: dict, api_key: str = Depends(verify_api_key)):
+    """Expand a name into a full UX persona"""
+    try:
+        if "name" not in request:
+            raise HTTPException(status_code=400, detail="Name is required")
+        
+        # Create a base persona from the name
+        base_persona = f"A person named {request['name']}"
+        
+        # Generate full UX persona
+        ux_persona = generator.generate_ux_persona(base_persona)
+        if not ux_persona:
+            raise HTTPException(status_code=500, detail="Failed to generate persona")
+        
+        return {"ux_persona": ux_persona}
+    except Exception as e:
+        logging.error(f"Error expanding persona: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
