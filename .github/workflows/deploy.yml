@@ -40,4 +40,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: dylantarre/gen-persona:latest 
+          tags: dylantarre/gen-persona:latest
