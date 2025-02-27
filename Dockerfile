@@ -1,7 +1,4 @@
-FROM python:3.11-slim
-
-# Set the platform explicitly
-ARG TARGETPLATFORM=linux/amd64
+FROM --platform=linux/amd64 python:3.11-slim
 
 WORKDIR /app
 
@@ -27,5 +24,5 @@ USER appuser
 # Expose the port
 EXPOSE 9350
 
-# Run the application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "9350"]
+# Run the application with explicit Python path
+CMD ["/usr/local/bin/python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "9350"]

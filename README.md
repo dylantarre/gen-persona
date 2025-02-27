@@ -112,6 +112,54 @@ curl -X GET "https://gen.kolidos.com/random-ux-persona" \
      -H "X-API-Key: your_api_secret_key"
 ```
 
+### Get a Random Name
+
+**Endpoint:** `GET https://gen.kolidos.com/random-name`
+
+**Headers:**
+```
+X-API-Key: your_api_secret_key
+```
+
+**Example Request:**
+```bash
+curl -X GET "https://gen.kolidos.com/random-name" \
+     -H "X-API-Key: your_api_secret_key"
+```
+
+**Example Response:**
+```json
+{
+    "name": "Sarah Jane Wilson",
+    "base_persona": "A 35-year-old marketing manager who struggles with work-life balance."
+}
+```
+
+### Expand a Name into a Full Persona
+
+**Endpoint:** `POST https://gen.kolidos.com/expand-persona`
+
+**Headers:**
+```
+Content-Type: application/json
+X-API-Key: your_api_secret_key
+```
+
+**Request Body:**
+```json
+{
+    "name": "Sarah Jane Wilson"
+}
+```
+
+**Example Request:**
+```bash
+curl -X POST "https://gen.kolidos.com/expand-persona" \
+     -H "Content-Type: application/json" \
+     -H "X-API-Key: your_api_secret_key" \
+     -d '{"name": "Sarah Jane Wilson"}'
+```
+
 ### Check API Health
 
 **Endpoint:** `GET https://gen.kolidos.com/health`
@@ -357,76 +405,8 @@ def generate_multiple_personas(base_personas, delay_seconds=1):
 
 For issues and feature requests, please open an issue in the repository.
 
-### JSON Response Structure
+## JSON Response Structure
 
-The `/generate` and `/random-ux-persona` endpoints return a JSON object with the following structure:
+The `/generate`, `/random-ux-persona`, and `/expand-persona` endpoints return a JSON object with the following structure:
 
-```json
-{
-    "name": "Full Name",
-    "demographics": {
-        "age": "number",
-        "gender": "string",
-        "occupation": {
-            "title": "string",
-            "responsibilities": ["string"]
-        },
-        "education": {
-            "level": "string",
-            "field": "string"
-        },
-        "location": {
-            "city_region": "string",
-            "living_situation": "string"
-        },
-        "income": {
-            "level": "string",
-            "financial_situation": "string"
-        },
-        "family_status": "string"
-    },
-    "goals": {
-        "professional": ["string"],
-        "personal": ["string"],
-        "short_term": ["string"],
-        "long_term": ["string"]
-    },
-    "frustrations": {
-        "daily_workflow": ["string"],
-        "technology": ["string"],
-        "time_management": ["string"],
-        "communication": ["string"],
-        "industry_specific": ["string"]
-    },
-    "behaviors": {
-        "daily_routine": ["string"],
-        "technology_usage": ["string"],
-        "social_media": ["string"],
-        "shopping_habits": ["string"],
-        "decision_making": ["string"],
-        "information_seeking": ["string"]
-    },
-    "motivations": {
-        "values_beliefs": ["string"],
-        "professional_motivators": ["string"],
-        "personal_drivers": ["string"],
-        "success_vision": "string"
-    },
-    "technological_proficiency": {
-        "devices": ["string"],
-        "software_apps": ["string"],
-        "comfort_level": "string",
-        "learning_style": "string"
-    },
-    "preferred_channels": {
-        "communication": ["string"],
-        "media_consumption": ["string"],
-        "product_discovery": ["string"],
-        "social_networks": ["string"]
-    },
-    "day_in_life": "string",
-    "quote": "string"
-}
 ```
-
-This structured format makes it easy to integrate the persona data into your applications and design tools.

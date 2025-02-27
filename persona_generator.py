@@ -280,6 +280,45 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         # If we get here, all attempts failed
         raise Exception(f"Failed to generate valid UX persona after {max_retries} attempts")
 
+    def generate_name(self, base_persona):
+        """Generate just a name based on the base persona"""
+        template = '''Create a realistic full name for the following persona. Return ONLY the name, nothing else.
+
+{persona}
+
+Example: "John Michael Smith" or "Maria Elena Rodriguez"
+'''
+        
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an expert at creating realistic names that match demographic descriptions. Return only the name, nothing else."
+            },
+            {
+                "role": "user",
+                "content": template.format(persona=base_persona)
+            }
+        ]
+
+        try:
+            response = requests.post(
+                self.api_url,
+                headers=self.headers,
+                json={
+                    "model": "google/gemini-2.0-flash-001",
+                    "messages": messages
+                }
+            )
+            response.raise_for_status()
+            name = response.json()["choices"][0]["message"]["content"].strip().strip('"')
+            return {
+                "name": name,
+                "base_persona": base_persona  # Include the original persona
+            }
+        except Exception as e:
+            logger.error(f"Error generating name: {str(e)}")
+            raise
+
 def main():
     generator = PersonaGenerator()
     
