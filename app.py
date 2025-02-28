@@ -6,6 +6,7 @@ import os
 import random
 from dotenv import load_dotenv
 import logging
+from typing import Optional
 
 load_dotenv()
 
@@ -43,6 +44,11 @@ class NameResponse(BaseModel):
     name: str
     title: str
     base_persona: str
+
+class ExpandPersonaRequest(BaseModel):
+    name: str
+    title: Optional[str] = None
+    description: Optional[str] = None
 
 @app.post("/generate", response_model=PersonaResponse)
 async def generate_persona(request: PersonaRequest, api_key: str = Depends(verify_api_key)):
@@ -103,14 +109,19 @@ async def get_random_name(api_key: str = Depends(verify_api_key)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/expand-persona", response_model=PersonaResponse)
-async def expand_persona(request: dict, api_key: str = Depends(verify_api_key)):
+async def expand_persona(request: ExpandPersonaRequest, api_key: str = Depends(verify_api_key)):
     """Expand a name into a full UX persona"""
     try:
-        if "name" not in request:
+        if not request.name:
             raise HTTPException(status_code=400, detail="Name is required")
         
         # Create a base persona from the name
-        base_persona = f"A person named {request['name']}"
+        base_persona_parts = [f"A person named {request.name}"]
+        if request.title:
+            base_persona_parts.append(f" with title {request.title}")
+        if request.description:
+            base_persona_parts.append(f" who is described as {request.description}")
+        base_persona = " ".join(base_persona_parts)
         
         # Generate full UX persona
         ux_persona = generator.generate_ux_persona(base_persona)
