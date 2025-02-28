@@ -285,8 +285,13 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         # If we get here, all attempts failed
         raise Exception(f"Failed to generate valid UX persona after {max_retries} attempts")
 
-    def generate_name(self, base_persona):
-        """Generate a name and title based on the base persona"""
+    def generate_name(self, base_persona, restate=False):
+        """Generate a name and title based on the base persona
+        
+        Args:
+            base_persona (str): The original persona description
+            restate (bool, optional): Whether to restate the persona before generating a name. Defaults to False.
+        """
         # If we have too many cached names, clear some to prevent memory issues
         if len(self.name_cache) > 100:
             self.name_cache = set(random.sample(list(self.name_cache), 50))
@@ -297,8 +302,8 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         max_retries = 5
         retry_count = 0
         
-        # First, restate the base_persona with different phrasing but same meaning
-        restated_persona = self._restate_persona(base_persona)
+        # Only restate if explicitly requested
+        persona_to_use = self._restate_persona(base_persona) if restate else base_persona
         
         while retry_count < max_retries:
             # Generate a more complex seed using multiple factors
@@ -309,7 +314,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
             
             # Create template without f-string to avoid nested formatting issues
             template = "Create a realistic American name for the following persona that authentically reflects who they are:\n\n"
-            template += restated_persona  # Use the restated persona instead of the original
+            template += persona_to_use  # Use either original or restated persona based on restate parameter
             template += "\n\nIMPORTANT: Using unique seed \"" + seed + "\" for inspiration, create a name that:\n\n"
             template += "1. Feels authentic to the persona's background, profession, age, and characteristics\n"
             template += "2. Represents the diversity of names you would find in America\n"
@@ -450,7 +455,8 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
                 return {
                     "name": name,
                     "title": title,
-                    "base_persona": base_persona  # Include the original base_persona instead of restated
+                    "base_persona": base_persona,  # Always include the original base_persona
+                    "restated_persona": persona_to_use if restate else None  # Include restated persona only if requested
                 }
             except Exception as e:
                 logger.error(f"Error generating name and title: {str(e)}")
@@ -537,7 +543,8 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         return {
             "name": random_name,
             "title": title,
-            "base_persona": base_persona  # Include the original base_persona
+            "base_persona": base_persona,  # Always include the original base_persona
+            "restated_persona": persona_to_use if restate else None  # Include restated persona only if requested
         }
         
     def _restate_persona(self, base_persona):
