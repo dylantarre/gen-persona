@@ -148,16 +148,20 @@ X-API-Key: your_api_secret_key
 **Request Body:**
 ```json
 {
-    "name": "Sarah Jane Wilson"
+    "name": "Sarah Jane Wilson",
+    "title": "Digital Nomad",
+    "description": "A 35-year-old marketing manager who struggles with work-life balance"
 }
 ```
+
+> **Note:** The `title` and `description` fields are optional. If provided, they will be incorporated into the generated persona. If omitted, the API will generate a persona based solely on the name.
 
 **Example Request:**
 ```bash
 curl -X POST "https://gen.kolidos.com/expand-persona" \
      -H "Content-Type: application/json" \
      -H "X-API-Key: your_api_secret_key" \
-     -d '{"name": "Sarah Jane Wilson"}'
+     -d '{"name": "Sarah Jane Wilson", "title": "Digital Nomad", "description": "A 35-year-old marketing manager who struggles with work-life balance"}'
 ```
 
 ### Check API Health
