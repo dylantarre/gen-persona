@@ -41,6 +41,7 @@ class RandomPersonaResponse(BaseModel):
 
 class NameResponse(BaseModel):
     name: str
+    title: str
     base_persona: str
 
 @app.post("/generate", response_model=PersonaResponse)

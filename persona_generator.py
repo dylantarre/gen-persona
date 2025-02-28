@@ -281,18 +281,24 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         raise Exception(f"Failed to generate valid UX persona after {max_retries} attempts")
 
     def generate_name(self, base_persona):
-        """Generate just a name based on the base persona"""
-        template = '''Create a realistic full name for the following persona. Return ONLY the name, nothing else.
+        """Generate a name and title based on the base persona"""
+        template = '''Create a realistic full name and a short descriptive title for the following persona.
 
 {persona}
 
-Example: "John Michael Smith" or "Maria Elena Rodriguez"
+Return your response in this exact format:
+Name: [Full Name]
+Title: [Short descriptive title like "Power User", "Mobile-First User", "Tech Enthusiast", "Remote Worker", etc.]
+
+Example:
+Name: John Michael Smith
+Title: Digital Nomad
 '''
         
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert at creating realistic names that match demographic descriptions. Return only the name, nothing else."
+                "content": "You are an expert at creating realistic names and descriptive titles that match demographic descriptions."
             },
             {
                 "role": "user",
@@ -310,13 +316,25 @@ Example: "John Michael Smith" or "Maria Elena Rodriguez"
                 }
             )
             response.raise_for_status()
-            name = response.json()["choices"][0]["message"]["content"].strip().strip('"')
+            content = response.json()["choices"][0]["message"]["content"].strip()
+            
+            # Parse the response to extract name and title
+            name = ""
+            title = ""
+            
+            for line in content.split('\n'):
+                if line.startswith("Name:"):
+                    name = line.replace("Name:", "").strip()
+                elif line.startswith("Title:"):
+                    title = line.replace("Title:", "").strip()
+            
             return {
                 "name": name,
+                "title": title,
                 "base_persona": base_persona  # Include the original persona
             }
         except Exception as e:
-            logger.error(f"Error generating name: {str(e)}")
+            logger.error(f"Error generating name and title: {str(e)}")
             raise
 
 def main():
