@@ -298,11 +298,11 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         retry_count = 0
         
         while retry_count < max_retries:
-            # Generate a seed using the persona content and a random number
-            # This ensures different personas get different seeds
+            # Generate a more complex seed using multiple factors
             persona_hash = hash(base_persona) % 10000
-            timestamp = int(time.time()) % 10000
-            seed = f"{persona_hash}-{random.randint(1000, 9999)}-{timestamp}"
+            timestamp = int(time.time() * 1000) % 10000
+            random_component = random.randint(10000, 99999)
+            seed = f"{persona_hash}-{random_component}-{timestamp}-{random.choice(['A','B','C','D','E','F'])}"
             
             # Create template without f-string to avoid nested formatting issues
             template = "Create a realistic American name for the following persona that authentically reflects who they are:\n\n"
@@ -314,9 +314,9 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
             template += "4. Is unique and distinctive\n"
             template += "5. Would be recognizable as an American name (including names from various cultural backgrounds that are common in America)\n\n"
             
-            # Add a note about uniqueness without banning specific names
+            # Add a note about uniqueness and specifically mention problematic names
             template += "IMPORTANT: Please be creative and generate a truly unique name. The system has already generated many names, so try to create something fresh and different.\n\n"
-            template += "NOTE: The name 'Anya' has been used too frequently. Please avoid this name and create something different.\n\n"
+            template += "NOTE: The names 'Anya', 'Serena', 'Rohan', 'Indira', 'Hollis', 'Seraphina', and 'Zoya' have been used too frequently. Please avoid these names and create something different.\n\n"
             
             # Add extensive examples of diverse American names to inspire variety
             template += "Here are examples of diverse American names for inspiration (DO NOT use these exact names, create new ones):\n\n"
@@ -331,42 +331,60 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
             template += "Hispanic/Latino American names:\n"
             template += "- Miguel Diaz, Sofia Fernandez, Carlos Flores, Isabella Gomez\n"
             template += "- Jose Gutierrez, Elena Hernandez, Luis Lopez, Gabriela Martinez\n"
-            template += "- Antonio Morales, Valentina Ortiz, Francisco Perez, Camila Ramirez\n\n"
+            template += "- Antonio Morales, Valentina Ortiz, Francisco Perez, Camila Ramirez\n"
+            template += "- Alejandro Sanchez, Carmen Vasquez, Javier Rodriguez, Lucia Torres\n\n"
             
             # Asian American names
             template += "Asian American names:\n"
             template += "- Wei Zhang, Mei Chen, Li Liu, Jing Wang\n"
             template += "- Hiroshi Tanaka, Yuki Suzuki, Takashi Yamamoto, Sakura Nakamura\n"
             template += "- Sanjay Gupta, Priya Sharma, Raj Patel, Lakshmi Desai\n"
-            template += "- Jin Park, Min Lee, Seung Choi, Ji Kang\n\n"
+            template += "- Jin Park, Min Lee, Seung Choi, Ji Kang\n"
+            template += "- Anh Nguyen, Binh Tran, Minh Pham, Linh Vo\n"
+            template += "- Mei-Ling Wu, Tao Yang, Xiu Huang, Feng Zhou\n\n"
             
             # Middle Eastern/North African American names
             template += "Middle Eastern/North African American names:\n"
             template += "- Omar Ali, Fatima Khan, Ali Ahmed, Leila Hassan\n"
-            template += "- Mohammed Ibrahim, Yasmin Mahmoud, Ahmed Abadi, Nadia El-Amin\n\n"
+            template += "- Mohammed Ibrahim, Yasmin Mahmoud, Ahmed Abadi, Nadia El-Amin\n"
+            template += "- Zara Abboud, Karim Najjar, Layla Hakim, Tariq Masri\n\n"
             
             # African American names
             template += "African American names:\n"
             template += "- Jamal Washington, Keisha Jefferson, Darnell Banks, Latoya Booker\n"
-            template += "- Tyrone Coleman, Shaniqua Dixon, DeAndre Freeman, Imani Gaines\n\n"
+            template += "- Tyrone Coleman, Shaniqua Dixon, DeAndre Freeman, Imani Gaines\n"
+            template += "- Marcus Johnson, Aaliyah Williams, Terrell Davis, Ebony Wilson\n"
+            template += "- Darius Smith, Aisha Thompson, Malik Jackson, Tiana Harris\n\n"
             
             # European American names
             template += "European American names:\n"
             template += "- Giovanni Rossi, Isabella Bianchi, Dmitri Ivanov, Natasha Petrov\n"
-            template += "- Hans Muller, Ingrid Weber, Pierre Dubois, Sophie Moreau\n\n"
+            template += "- Hans Muller, Ingrid Weber, Pierre Dubois, Sophie Moreau\n"
+            template += "- Sven Johansson, Astrid Lindgren, Klaus Schmidt, Brigitte Hoffmann\n"
+            template += "- Liam O'Connor, Siobhan Murphy, Declan Kelly, Fiona Byrne\n\n"
             
             # Jewish American names
             template += "Jewish American names:\n"
             template += "- Ari Cohen, Rachel Goldberg, Moshe Friedman, Leah Shapiro\n"
-            template += "- Eli Levy, Sarah Katz, Isaac Stern, Rebecca Rosen\n\n"
+            template += "- Eli Levy, Sarah Katz, Isaac Stern, Rebecca Rosen\n"
+            template += "- Benjamin Abramowitz, Hannah Silverman, Noah Greenberg, Esther Finkelstein\n\n"
             
             # Native American names
             template += "Native American names:\n"
-            template += "- Koda Blackhawk, Aiyana Eagleheart, Bodaway Redhorse, Halona Thundercloud\n\n"
+            template += "- Koda Blackhawk, Aiyana Eagleheart, Bodaway Redhorse, Halona Thundercloud\n"
+            template += "- Chayton Whitefeather, Nayeli Rainwater, Takoda Strongbow, Winona Skyhawk\n\n"
             
             # Pacific Islander American names
             template += "Pacific Islander American names:\n"
-            template += "- Kekoa Kalani, Leilani Kealoha, Keanu Mahelona, Moana Nainoa\n\n"
+            template += "- Kekoa Kalani, Leilani Kealoha, Keanu Mahelona, Moana Nainoa\n"
+            template += "- Kai Akamu, Alana Kahale, Malie Kanoa, Nohea Palakiko\n\n"
+            
+            # Additional diverse names
+            template += "Additional diverse names:\n"
+            template += "- Amara Okafor, Kwame Mensah, Chioma Adebayo, Oluchi Eze\n"
+            template += "- Arjun Mehta, Divya Chadha, Vikram Malhotra, Ananya Reddy\n"
+            template += "- Thuy Phan, Quang Dang, Hien Bui, Tuyet Duong\n"
+            template += "- Cheng-Wei Lin, Mei-Xiu Huang, Jian-Yong Zhao, Xiao-Ling Tang\n\n"
             
             template += "Return your response in this exact format:\n"
             template += "Name: [Full Name]\n"
@@ -378,7 +396,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
             messages = [
                 {
                     "role": "system",
-                    "content": "You are an expert at creating authentic American names that match personas. You create names that reflect America's diverse population, drawing from various cultural backgrounds represented in the United States. Each name you create is unique while still feeling genuine to the persona's characteristics. You never repeat names you've created before."
+                    "content": "You are an expert at creating authentic American names that match personas. You create names that reflect America's diverse population, drawing from various cultural backgrounds represented in the United States. Each name you create is unique while still feeling genuine to the persona's characteristics. You never repeat names you've created before. You are especially good at creating fresh, original names that haven't been used before."
                 },
                 {
                     "role": "user",
@@ -393,7 +411,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
                     json={
                         "model": "google/gemini-2.0-flash-001",
                         "messages": messages,
-                        "temperature": 0.9  # Add temperature to increase randomness
+                        "temperature": 1.0  # Increase temperature for more randomness
                     }
                 )
                 response.raise_for_status()
@@ -438,30 +456,61 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         # If we've exhausted all retries, generate a completely random name
         logger.warning(f"Exhausted all {max_retries} retries, generating a fallback name")
         
-        # List of diverse first and last names to use as fallback
-        first_names = ["Michael", "Sarah", "David", "Jennifer", "James", "Maria", "Robert", "Linda", "William", "Elizabeth", 
-                      "Richard", "Patricia", "Joseph", "Susan", "Thomas", "Jessica", "Charles", "Margaret", "Daniel", "Karen",
-                      "Matthew", "Nancy", "Anthony", "Lisa", "Mark", "Betty", "Donald", "Dorothy", "Steven", "Sandra",
-                      "Paul", "Ashley", "Andrew", "Kimberly", "Joshua", "Donna", "Kenneth", "Emily", "Kevin", "Michelle",
-                      "Brian", "Amanda", "George", "Melissa", "Edward", "Deborah", "Ronald", "Stephanie", "Timothy", "Rebecca",
-                      "Jason", "Laura", "Jeffrey", "Sharon", "Ryan", "Cynthia", "Jacob", "Kathleen", "Gary", "Amy",
-                      "Nicholas", "Shirley", "Eric", "Angela", "Jonathan", "Helen", "Stephen", "Anna", "Larry", "Brenda"]
+        # List of diverse first and last names to use as fallback - EXPANDED
+        first_names = [
+            # Common American names
+            "Michael", "Sarah", "David", "Jennifer", "James", "Maria", "Robert", "Linda", "William", "Elizabeth", 
+            "Richard", "Patricia", "Joseph", "Susan", "Thomas", "Jessica", "Charles", "Margaret", "Daniel", "Karen",
+            "Matthew", "Nancy", "Anthony", "Lisa", "Mark", "Betty", "Donald", "Dorothy", "Steven", "Sandra",
+            "Paul", "Ashley", "Andrew", "Kimberly", "Joshua", "Donna", "Kenneth", "Emily", "Kevin", "Michelle",
+            "Brian", "Amanda", "George", "Melissa", "Edward", "Deborah", "Ronald", "Stephanie", "Timothy", "Rebecca",
+            "Jason", "Laura", "Jeffrey", "Sharon", "Ryan", "Cynthia", "Jacob", "Kathleen", "Gary", "Amy",
+            "Nicholas", "Shirley", "Eric", "Angela", "Jonathan", "Helen", "Stephen", "Anna", "Larry", "Brenda",
+            # Additional diverse names
+            "Miguel", "Sofia", "Carlos", "Isabella", "Jose", "Elena", "Luis", "Gabriela", "Antonio", "Valentina",
+            "Wei", "Mei", "Li", "Jing", "Hiroshi", "Yuki", "Takashi", "Sakura", "Sanjay", "Priya",
+            "Raj", "Lakshmi", "Jin", "Min", "Seung", "Ji", "Omar", "Fatima", "Ali", "Leila",
+            "Mohammed", "Yasmin", "Ahmed", "Nadia", "Jamal", "Keisha", "Darnell", "Latoya", "Tyrone", "Shaniqua",
+            "Giovanni", "Isabella", "Dmitri", "Natasha", "Hans", "Ingrid", "Pierre", "Sophie", "Ari", "Rachel",
+            "Moshe", "Leah", "Eli", "Sarah", "Isaac", "Rebecca", "Koda", "Aiyana", "Bodaway", "Halona",
+            "Kekoa", "Leilani", "Keanu", "Moana", "Amara", "Kwame", "Chioma", "Oluchi", "Arjun", "Divya",
+            "Vikram", "Ananya", "Thuy", "Quang", "Hien", "Tuyet", "Cheng", "Mei-Xiu", "Jian", "Xiao"
+        ]
         
-        last_names = ["Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor",
-                     "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson",
-                     "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Hall", "Allen", "Young", "Hernandez", "King",
-                     "Wright", "Lopez", "Hill", "Scott", "Green", "Adams", "Baker", "Gonzalez", "Nelson", "Carter",
-                     "Mitchell", "Perez", "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins",
-                     "Stewart", "Sanchez", "Morris", "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy", "Bailey",
-                     "Rivera", "Cooper", "Richardson", "Cox", "Howard", "Ward", "Torres", "Peterson", "Gray", "Ramirez"]
+        last_names = [
+            # Common American last names
+            "Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor",
+            "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson",
+            "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Hall", "Allen", "Young", "Hernandez", "King",
+            "Wright", "Lopez", "Hill", "Scott", "Green", "Adams", "Baker", "Gonzalez", "Nelson", "Carter",
+            "Mitchell", "Perez", "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins",
+            "Stewart", "Sanchez", "Morris", "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy", "Bailey",
+            "Rivera", "Cooper", "Richardson", "Cox", "Howard", "Ward", "Torres", "Peterson", "Gray", "Ramirez",
+            # Additional diverse last names
+            "Diaz", "Fernandez", "Flores", "Gomez", "Gutierrez", "Hernandez", "Lopez", "Martinez", "Morales", "Ortiz",
+            "Zhang", "Chen", "Liu", "Wang", "Tanaka", "Suzuki", "Yamamoto", "Nakamura", "Gupta", "Sharma",
+            "Patel", "Desai", "Park", "Lee", "Choi", "Kang", "Ali", "Khan", "Ahmed", "Hassan",
+            "Ibrahim", "Mahmoud", "Abadi", "El-Amin", "Washington", "Jefferson", "Banks", "Booker", "Coleman", "Dixon",
+            "Rossi", "Bianchi", "Ivanov", "Petrov", "Muller", "Weber", "Dubois", "Moreau", "Cohen", "Goldberg",
+            "Friedman", "Shapiro", "Levy", "Katz", "Stern", "Rosen", "Blackhawk", "Eagleheart", "Redhorse", "Thundercloud",
+            "Kalani", "Kealoha", "Mahelona", "Nainoa", "Okafor", "Mensah", "Adebayo", "Eze", "Mehta", "Chadha",
+            "Malhotra", "Reddy", "Phan", "Dang", "Bui", "Duong", "Lin", "Huang", "Zhao", "Tang"
+        ]
         
         # Generate a random name
         random_first = random.choice(first_names)
         random_last = random.choice(last_names)
         
         # Make sure we don't use a first name that's already in the cache
-        while random_first in self.first_name_cache:
+        attempts = 0
+        while random_first in self.first_name_cache and attempts < 10:
             random_first = random.choice(first_names)
+            attempts += 1
+        
+        # If we still can't find a unique name after 10 attempts, just use what we have
+        # This prevents infinite loops in extreme cases
+        if attempts >= 10:
+            logger.warning("Could not find a unique first name after 10 attempts, using a potentially repeated name")
         
         random_name = f"{random_first} {random_last}"
         
