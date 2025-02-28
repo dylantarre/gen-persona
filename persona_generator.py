@@ -292,8 +292,9 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         if len(self.first_name_cache) > 100:
             self.first_name_cache = set(random.sample(list(self.first_name_cache), 50))
         
-        # Generate a complex seed with letters, numbers and special characters
-        seed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
+        # Generate a complex seed with letters, numbers and safe special characters
+        # Avoid characters that could interfere with string formatting like { and }
+        seed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+|;:,.<>"
         seed_length = random.randint(8, 15)  # Longer, variable length seed
         seed = ''.join(random.choice(seed_chars) for _ in range(seed_length))
         
