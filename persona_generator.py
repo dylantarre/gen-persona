@@ -282,15 +282,20 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
 
     def generate_name(self, base_persona):
         """Generate a name and title based on the base persona"""
-        template = '''Create a realistic full name and a short descriptive title for the following persona.
+        template = '''Create a realistic full name for the following persona that directly reflects their background, ethnicity, age, and other characteristics described in the persona. The name should feel authentic to who this person is.
 
 {persona}
 
-IMPORTANT: Generate a diverse, unique name that reflects the diversity of America. Include names from various cultural backgrounds (African American, Hispanic, Asian American, European, Middle Eastern, etc.) but avoid stereotypical or repetitive patterns. Do NOT use names with "Rose" as a middle name, and avoid repeating first names you've used before. Each name should feel distinct and authentic to the persona.
+IMPORTANT: The name should be a natural fit for this specific persona. Consider:
+1. Cultural/ethnic background mentioned or implied in the persona
+2. Age group and generation (different generations have different naming trends)
+3. Geographic location if mentioned
+4. Professional field or social context
+5. Any other demographic information provided
 
 Return your response in this exact format:
 Name: [Full Name]
-Title: [Short descriptive title like "Power User", "Mobile-First User", "Tech Enthusiast", "Remote Worker", etc.]
+Title: [Short descriptive title that captures their role or key characteristic]
 
 Example:
 Name: John Michael Smith
@@ -300,7 +305,7 @@ Title: Digital Nomad
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert at creating realistic, diverse names and descriptive titles that match demographic descriptions. Avoid repetitive patterns and create unique, authentic identities."
+                "content": "You are an expert at creating authentic, persona-appropriate names and descriptive titles. You analyze the details of a persona and generate names that feel genuine to their background, ethnicity, age, and other characteristics."
             },
             {
                 "role": "user",
