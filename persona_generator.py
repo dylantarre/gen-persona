@@ -286,6 +286,8 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
 
 {persona}
 
+IMPORTANT: Generate a diverse, unique name that reflects the diversity of America. Include names from various cultural backgrounds (African American, Hispanic, Asian American, European, Middle Eastern, etc.) but avoid stereotypical or repetitive patterns. Do NOT use names with "Rose" as a middle name, and avoid repeating first names you've used before. Each name should feel distinct and authentic to the persona.
+
 Return your response in this exact format:
 Name: [Full Name]
 Title: [Short descriptive title like "Power User", "Mobile-First User", "Tech Enthusiast", "Remote Worker", etc.]
@@ -298,7 +300,7 @@ Title: Digital Nomad
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert at creating realistic names and descriptive titles that match demographic descriptions."
+                "content": "You are an expert at creating realistic, diverse names and descriptive titles that match demographic descriptions. Avoid repetitive patterns and create unique, authentic identities."
             },
             {
                 "role": "user",
