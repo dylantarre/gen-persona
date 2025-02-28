@@ -292,32 +292,24 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         if len(self.first_name_cache) > 100:
             self.first_name_cache = set(random.sample(list(self.first_name_cache), 50))
         
-        # Generate a complex seed with letters, numbers and safe special characters
-        # Avoid characters that could interfere with string formatting like { and }
-        seed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+|;:,.<>"
-        seed_length = random.randint(8, 15)  # Longer, variable length seed
-        seed = ''.join(random.choice(seed_chars) for _ in range(seed_length))
+        # Generate a simple seed (just numbers) to avoid format string issues
+        seed = str(random.randint(1000, 9999))
         
-        template = f'''Create a realistic American name for the following persona that authentically reflects who they are:
-
-{{persona}}
-
-IMPORTANT: Using unique seed "{seed}" for inspiration, create a name that:
-
-1. Feels authentic to the persona's background, profession, age, and characteristics
-2. Represents the diversity of names you would find in America
-3. Feels natural and believable for this specific persona
-4. Is unique and distinctive
-5. Would be recognizable as an American name (including names from various cultural backgrounds that are common in America)
-
-Return your response in this exact format:
-Name: [Full Name]
-Title: [Short descriptive title that captures their role or key characteristic]
-
-Example:
-Name: John Michael Smith
-Title: Digital Nomad
-'''
+        # Create template without f-string to avoid nested formatting issues
+        template = "Create a realistic American name for the following persona that authentically reflects who they are:\n\n"
+        template += base_persona
+        template += "\n\nIMPORTANT: Using unique seed \"" + seed + "\" for inspiration, create a name that:\n\n"
+        template += "1. Feels authentic to the persona's background, profession, age, and characteristics\n"
+        template += "2. Represents the diversity of names you would find in America\n"
+        template += "3. Feels natural and believable for this specific persona\n"
+        template += "4. Is unique and distinctive\n"
+        template += "5. Would be recognizable as an American name (including names from various cultural backgrounds that are common in America)\n\n"
+        template += "Return your response in this exact format:\n"
+        template += "Name: [Full Name]\n"
+        template += "Title: [Short descriptive title that captures their role or key characteristic]\n\n"
+        template += "Example:\n"
+        template += "Name: John Michael Smith\n"
+        template += "Title: Digital Nomad"
         
         messages = [
             {
@@ -326,7 +318,7 @@ Title: Digital Nomad
             },
             {
                 "role": "user",
-                "content": template.format(persona=base_persona)
+                "content": template
             }
         ]
 
