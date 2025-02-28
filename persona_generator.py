@@ -546,12 +546,17 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         template = "Restate the following persona description in a single, natural sentence that a UX researcher might jot down in their notes. Keep the same meaning and all key details about age, profession, and characteristics:\n\n"
         template += base_persona
         template += "\n\nIMPORTANT: Your response should be ONLY ONE SENTENCE. No prefacing text, no explanations, no bullet points. Write it as a human would naturally take a quick note. Start directly with the restated description."
-        template += "\n\nCRITICAL: The description MUST be about a PERSON, never a company, business, or organization. If the input describes a business, convert it to describe a person who works at or owns that business instead."
+        template += "\n\nCRITICAL: The description MUST be about a PERSON, never a company, business, or organization. If the input describes a business, convert it to describe a person who works at or owns that business instead. ALWAYS describe an individual human being with personal characteristics."
+        template += "\n\nEXAMPLES OF CONVERSION:"
+        template += "\nInput: 'This is a business incubator offering office space and mentorship.'"
+        template += "\nOutput: '45-year-old business consultant who runs an incubator offering office space and mentorship to startups.'"
+        template += "\n\nInput: 'A biotech startup focused on gene therapy research.'"
+        template += "\nOutput: '38-year-old biotech entrepreneur leading a startup focused on gene therapy research.'"
         
         messages = [
             {
                 "role": "system",
-                "content": "You are a UX researcher who takes concise, natural notes about individual people. You restate information in a single sentence that sounds like something a human would write in their notebook. You never add prefacing text or explanations. You only write about individual human personas, never companies or organizations."
+                "content": "You are a UX researcher who takes concise, natural notes about individual people. You restate information in a single sentence that sounds like something a human would write in their notebook. You never add prefacing text or explanations. You ONLY write about individual human personas, NEVER companies or organizations. If given information about a business or organization, you ALWAYS convert it to describe a specific person who works at, owns, or runs that business."
             },
             {
                 "role": "user",
@@ -559,24 +564,55 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
             }
         ]
 
-        try:
-            response = requests.post(
-                self.api_url,
-                headers=self.headers,
-                json={
-                    "model": "google/gemini-2.0-flash-001",
-                    "messages": messages,
-                    "temperature": 0.7  # Moderate temperature for rephrasing
-                }
-            )
-            response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"].strip()
-            logger.info(f"Successfully restated persona: {content[:50]}...")
-            return content
-        except Exception as e:
-            logger.error(f"Error restating persona: {str(e)}")
-            # If there's an error, just return the original persona
-            return base_persona
+        # Add validation and retry logic
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    self.api_url,
+                    headers=self.headers,
+                    json={
+                        "model": "google/gemini-2.0-flash-001",
+                        "messages": messages,
+                        "temperature": 0.7  # Moderate temperature for rephrasing
+                    }
+                )
+                response.raise_for_status()
+                content = response.json()["choices"][0]["message"]["content"].strip()
+                
+                # Validate that the response is about a person
+                business_indicators = ["this is a business", "this business", "this company", "this organization", 
+                                      "we're talking about a business", "a business that", "the business", 
+                                      "they offer", "they provide", "they specialize"]
+                
+                is_about_business = any(indicator.lower() in content.lower() for indicator in business_indicators)
+                
+                if is_about_business and attempt < max_retries - 1:
+                    logger.warning(f"Attempt {attempt+1}/{max_retries}: Response still describes a business: {content[:50]}...")
+                    # Add more explicit instructions for the retry
+                    retry_message = {
+                        "role": "user",
+                        "content": "Your response still describes a business or organization, not a person. Please convert this to describe a SPECIFIC INDIVIDUAL PERSON who owns, runs, or works at this business. Include their age and personal characteristics. For example: '42-year-old founder of a tech startup who...' or '35-year-old manager at a retail business who...'"
+                    }
+                    messages.append(retry_message)
+                    continue
+                
+                logger.info(f"Successfully restated persona: {content[:50]}...")
+                return content
+            except Exception as e:
+                logger.error(f"Error restating persona: {str(e)}")
+                if attempt == max_retries - 1:
+                    # If all retries fail, convert it manually as a last resort
+                    if any(business_term in base_persona.lower() for business_term in ["business", "company", "startup", "organization", "firm", "enterprise"]):
+                        age = random.randint(35, 55)
+                        roles = ["founder", "CEO", "manager", "director", "owner", "entrepreneur"]
+                        role = random.choice(roles)
+                        return f"{age}-year-old {role} of a {base_persona.lower().strip('.')}"
+                    # If it's not clearly a business, return the original
+                    return base_persona
+        
+        # If we get here, all attempts failed
+        return base_persona
 
 def main():
     generator = PersonaGenerator()
