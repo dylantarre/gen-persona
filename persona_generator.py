@@ -546,11 +546,12 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         template = "Restate the following persona description in a single, natural sentence that a UX researcher might jot down in their notes. Keep the same meaning and all key details about age, profession, and characteristics:\n\n"
         template += base_persona
         template += "\n\nIMPORTANT: Your response should be ONLY ONE SENTENCE. No prefacing text, no explanations, no bullet points. Write it as a human would naturally take a quick note. Start directly with the restated description."
+        template += "\n\nCRITICAL: The description MUST be about a PERSON, never a company, business, or organization. If the input describes a business, convert it to describe a person who works at or owns that business instead."
         
         messages = [
             {
                 "role": "system",
-                "content": "You are a UX researcher who takes concise, natural notes. You restate information in a single sentence that sounds like something a human would write in their notebook. You never add prefacing text or explanations."
+                "content": "You are a UX researcher who takes concise, natural notes about individual people. You restate information in a single sentence that sounds like something a human would write in their notebook. You never add prefacing text or explanations. You only write about individual human personas, never companies or organizations."
             },
             {
                 "role": "user",
