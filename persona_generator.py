@@ -297,6 +297,9 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         max_retries = 5
         retry_count = 0
         
+        # First, restate the base_persona with different phrasing but same meaning
+        restated_persona = self._restate_persona(base_persona)
+        
         while retry_count < max_retries:
             # Generate a more complex seed using multiple factors
             persona_hash = hash(base_persona) % 10000
@@ -306,7 +309,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
             
             # Create template without f-string to avoid nested formatting issues
             template = "Create a realistic American name for the following persona that authentically reflects who they are:\n\n"
-            template += base_persona
+            template += restated_persona  # Use the restated persona instead of the original
             template += "\n\nIMPORTANT: Using unique seed \"" + seed + "\" for inspiration, create a name that:\n\n"
             template += "1. Feels authentic to the persona's background, profession, age, and characteristics\n"
             template += "2. Represents the diversity of names you would find in America\n"
@@ -534,8 +537,45 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         return {
             "name": random_name,
             "title": title,
-            "base_persona": base_persona
+            "base_persona": base_persona  # Include the original persona
         }
+        
+    def _restate_persona(self, base_persona):
+        """Restate the base persona with different phrasing but same meaning"""
+        # Use the API to restate the persona
+        template = "Restate the following persona description using different phrasing but keeping the exact same meaning. Make sure to preserve all key details about age, profession, characteristics, and other important information:\n\n"
+        template += base_persona
+        template += "\n\nRestate it in a way that sounds natural and conversational, but maintains all the important information."
+        
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an expert at rephrasing text while preserving its original meaning. You restate information using different words and sentence structures, but you never add or remove any key details."
+            },
+            {
+                "role": "user",
+                "content": template
+            }
+        ]
+
+        try:
+            response = requests.post(
+                self.api_url,
+                headers=self.headers,
+                json={
+                    "model": "google/gemini-2.0-flash-001",
+                    "messages": messages,
+                    "temperature": 0.7  # Moderate temperature for rephrasing
+                }
+            )
+            response.raise_for_status()
+            content = response.json()["choices"][0]["message"]["content"].strip()
+            logger.info(f"Successfully restated persona: {content[:50]}...")
+            return content
+        except Exception as e:
+            logger.error(f"Error restating persona: {str(e)}")
+            # If there's an error, just return the original persona
+            return base_persona
 
 def main():
     generator = PersonaGenerator()
