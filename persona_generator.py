@@ -292,11 +292,22 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         if len(self.first_name_cache) > 100:
             self.first_name_cache = set(random.sample(list(self.first_name_cache), 50))
         
-        template = '''Create a realistic full name for the following persona that authentically reflects who they are:
+        # Generate a complex seed with letters, numbers and special characters
+        seed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?"
+        seed_length = random.randint(8, 15)  # Longer, variable length seed
+        seed = ''.join(random.choice(seed_chars) for _ in range(seed_length))
+        
+        template = f'''Create a realistic American name for the following persona that authentically reflects who they are:
 
-{persona}
+{{persona}}
 
-Consider the persona's background, profession, age, and any other relevant characteristics when creating the name.
+IMPORTANT: Using unique seed "{seed}" for inspiration, create a name that:
+
+1. Feels authentic to the persona's background, profession, age, and characteristics
+2. Represents the diversity of names you would find in America
+3. Feels natural and believable for this specific persona
+4. Is unique and distinctive
+5. Would be recognizable as an American name (including names from various cultural backgrounds that are common in America)
 
 Return your response in this exact format:
 Name: [Full Name]
@@ -310,7 +321,7 @@ Title: Digital Nomad
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert at creating authentic, diverse names that match personas. You create names that feel genuine to a person's background and characteristics."
+                "content": "You are an expert at creating authentic American names that match personas. You create names that reflect America's diverse population, drawing from various cultural backgrounds represented in the United States. Each name you create is unique while still feeling genuine to the persona's characteristics."
             },
             {
                 "role": "user",
