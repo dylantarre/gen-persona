@@ -450,7 +450,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
                 return {
                     "name": name,
                     "title": title,
-                    "base_persona": base_persona  # Include the original persona
+                    "base_persona": restated_persona  # Include the restated persona instead of original
                 }
             except Exception as e:
                 logger.error(f"Error generating name and title: {str(e)}")
@@ -537,7 +537,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         return {
             "name": random_name,
             "title": title,
-            "base_persona": base_persona  # Include the original persona
+            "base_persona": restated_persona  # Include the restated persona instead of original
         }
         
     def _restate_persona(self, base_persona):
