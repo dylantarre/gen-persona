@@ -3,6 +3,7 @@ import json
 from dotenv import load_dotenv
 import requests
 import logging
+import random
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +24,9 @@ class PersonaGenerator:
             "Content-Type": "application/json",
             "HTTP-Referer": "https://github.com/yourusername/gen-persona",
         }
+        # Initialize name cache to avoid repetition
+        self.name_cache = set()
+        self.first_name_cache = set()
         logger.info("PersonaGenerator initialized with API key")
 
     def load_personas(self):
@@ -282,16 +286,17 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
 
     def generate_name(self, base_persona):
         """Generate a name and title based on the base persona"""
-        template = '''Create a realistic full name for the following persona that directly reflects their background, ethnicity, age, and other characteristics described in the persona. The name should feel authentic to who this person is.
+        # If we have too many cached names, clear some to prevent memory issues
+        if len(self.name_cache) > 100:
+            self.name_cache = set(random.sample(list(self.name_cache), 50))
+        if len(self.first_name_cache) > 100:
+            self.first_name_cache = set(random.sample(list(self.first_name_cache), 50))
+        
+        template = '''Create a realistic full name for the following persona that authentically reflects who they are:
 
 {persona}
 
-IMPORTANT: The name should be a natural fit for this specific persona. Consider:
-1. Cultural/ethnic background mentioned or implied in the persona
-2. Age group and generation (different generations have different naming trends)
-3. Geographic location if mentioned
-4. Professional field or social context
-5. Any other demographic information provided
+Consider the persona's background, profession, age, and any other relevant characteristics when creating the name.
 
 Return your response in this exact format:
 Name: [Full Name]
@@ -305,7 +310,7 @@ Title: Digital Nomad
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert at creating authentic, persona-appropriate names and descriptive titles. You analyze the details of a persona and generate names that feel genuine to their background, ethnicity, age, and other characteristics."
+                "content": "You are an expert at creating authentic, diverse names that match personas. You create names that feel genuine to a person's background and characteristics."
             },
             {
                 "role": "user",
@@ -334,6 +339,21 @@ Title: Digital Nomad
                     name = line.replace("Name:", "").strip()
                 elif line.startswith("Title:"):
                     title = line.replace("Title:", "").strip()
+            
+            # Check if this name or a similar one has been generated before
+            if name in self.name_cache:
+                logger.warning(f"Name '{name}' has been generated before, requesting a new one")
+                return self.generate_name(base_persona)  # Try again
+            
+            # Extract first name and check if it's been used before
+            first_name = name.split()[0] if name and " " in name else name
+            if first_name in self.first_name_cache:
+                logger.warning(f"First name '{first_name}' has been used before, requesting a new one")
+                return self.generate_name(base_persona)  # Try again
+            
+            # Add to cache
+            self.name_cache.add(name)
+            self.first_name_cache.add(first_name)
             
             return {
                 "name": name,
