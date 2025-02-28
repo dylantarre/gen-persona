@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import requests
 import logging
 import random
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -292,81 +293,148 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         if len(self.first_name_cache) > 100:
             self.first_name_cache = set(random.sample(list(self.first_name_cache), 50))
         
-        # Generate a simple seed (just numbers) to avoid format string issues
-        seed = str(random.randint(1000, 9999))
+        # Add a retry counter to prevent infinite loops
+        max_retries = 5
+        retry_count = 0
         
-        # Create template without f-string to avoid nested formatting issues
-        template = "Create a realistic American name for the following persona that authentically reflects who they are:\n\n"
-        template += base_persona
-        template += "\n\nIMPORTANT: Using unique seed \"" + seed + "\" for inspiration, create a name that:\n\n"
-        template += "1. Feels authentic to the persona's background, profession, age, and characteristics\n"
-        template += "2. Represents the diversity of names you would find in America\n"
-        template += "3. Feels natural and believable for this specific persona\n"
-        template += "4. Is unique and distinctive\n"
-        template += "5. Would be recognizable as an American name (including names from various cultural backgrounds that are common in America)\n\n"
-        template += "Return your response in this exact format:\n"
-        template += "Name: [Full Name]\n"
-        template += "Title: [Short descriptive title that captures their role or key characteristic]\n\n"
-        template += "Example:\n"
-        template += "Name: John Michael Smith\n"
-        template += "Title: Digital Nomad"
-        
-        messages = [
-            {
-                "role": "system",
-                "content": "You are an expert at creating authentic American names that match personas. You create names that reflect America's diverse population, drawing from various cultural backgrounds represented in the United States. Each name you create is unique while still feeling genuine to the persona's characteristics."
-            },
-            {
-                "role": "user",
-                "content": template
-            }
-        ]
-
-        try:
-            response = requests.post(
-                self.api_url,
-                headers=self.headers,
-                json={
-                    "model": "google/gemini-2.0-flash-001",
-                    "messages": messages
+        while retry_count < max_retries:
+            # Generate a seed using the persona content and a random number
+            # This ensures different personas get different seeds
+            persona_hash = hash(base_persona) % 10000
+            timestamp = int(time.time()) % 10000
+            seed = f"{persona_hash}-{random.randint(1000, 9999)}-{timestamp}"
+            
+            # Create template without f-string to avoid nested formatting issues
+            template = "Create a realistic American name for the following persona that authentically reflects who they are:\n\n"
+            template += base_persona
+            template += "\n\nIMPORTANT: Using unique seed \"" + seed + "\" for inspiration, create a name that:\n\n"
+            template += "1. Feels authentic to the persona's background, profession, age, and characteristics\n"
+            template += "2. Represents the diversity of names you would find in America\n"
+            template += "3. Feels natural and believable for this specific persona\n"
+            template += "4. Is unique and distinctive\n"
+            template += "5. Would be recognizable as an American name (including names from various cultural backgrounds that are common in America)\n\n"
+            
+            # Add a note about uniqueness without banning specific names
+            template += "IMPORTANT: Please be creative and generate a truly unique name. The system has already generated many names, so try to create something fresh and different.\n\n"
+            
+            template += "Return your response in this exact format:\n"
+            template += "Name: [Full Name]\n"
+            template += "Title: [Short descriptive title that captures their role or key characteristic]\n\n"
+            template += "Example:\n"
+            template += "Name: John Michael Smith\n"
+            template += "Title: Digital Nomad"
+            
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at creating authentic American names that match personas. You create names that reflect America's diverse population, drawing from various cultural backgrounds represented in the United States. Each name you create is unique while still feeling genuine to the persona's characteristics. You never repeat names you've created before."
+                },
+                {
+                    "role": "user",
+                    "content": template
                 }
-            )
-            response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"].strip()
-            
-            # Parse the response to extract name and title
-            name = ""
-            title = ""
-            
-            for line in content.split('\n'):
-                if line.startswith("Name:"):
-                    name = line.replace("Name:", "").strip()
-                elif line.startswith("Title:"):
-                    title = line.replace("Title:", "").strip()
-            
-            # Check if this name or a similar one has been generated before
-            if name in self.name_cache:
-                logger.warning(f"Name '{name}' has been generated before, requesting a new one")
-                return self.generate_name(base_persona)  # Try again
-            
-            # Extract first name and check if it's been used before
-            first_name = name.split()[0] if name and " " in name else name
-            if first_name in self.first_name_cache:
-                logger.warning(f"First name '{first_name}' has been used before, requesting a new one")
-                return self.generate_name(base_persona)  # Try again
-            
-            # Add to cache
-            self.name_cache.add(name)
-            self.first_name_cache.add(first_name)
-            
-            return {
-                "name": name,
-                "title": title,
-                "base_persona": base_persona  # Include the original persona
-            }
-        except Exception as e:
-            logger.error(f"Error generating name and title: {str(e)}")
-            raise
+            ]
+
+            try:
+                response = requests.post(
+                    self.api_url,
+                    headers=self.headers,
+                    json={
+                        "model": "google/gemini-2.0-flash-001",
+                        "messages": messages
+                    }
+                )
+                response.raise_for_status()
+                content = response.json()["choices"][0]["message"]["content"].strip()
+                
+                # Parse the response to extract name and title
+                name = ""
+                title = ""
+                
+                for line in content.split('\n'):
+                    if line.startswith("Name:"):
+                        name = line.replace("Name:", "").strip()
+                    elif line.startswith("Title:"):
+                        title = line.replace("Title:", "").strip()
+                
+                # Check if this name or a similar one has been generated before
+                if name in self.name_cache:
+                    logger.warning(f"Name '{name}' has been generated before, retry {retry_count+1}/{max_retries}")
+                    retry_count += 1
+                    continue
+                
+                # Extract first name and check if it's been used before
+                first_name = name.split()[0] if name and " " in name else name
+                if first_name in self.first_name_cache:
+                    logger.warning(f"First name '{first_name}' has been used before, retry {retry_count+1}/{max_retries}")
+                    retry_count += 1
+                    continue
+                
+                # Add to cache
+                self.name_cache.add(name)
+                self.first_name_cache.add(first_name)
+                
+                return {
+                    "name": name,
+                    "title": title,
+                    "base_persona": base_persona  # Include the original persona
+                }
+            except Exception as e:
+                logger.error(f"Error generating name and title: {str(e)}")
+                retry_count += 1
+        
+        # If we've exhausted all retries, generate a completely random name
+        logger.warning(f"Exhausted all {max_retries} retries, generating a fallback name")
+        
+        # List of diverse first and last names to use as fallback
+        first_names = ["Michael", "Sarah", "David", "Jennifer", "James", "Maria", "Robert", "Linda", "William", "Elizabeth", 
+                      "Richard", "Patricia", "Joseph", "Susan", "Thomas", "Jessica", "Charles", "Margaret", "Daniel", "Karen",
+                      "Matthew", "Nancy", "Anthony", "Lisa", "Mark", "Betty", "Donald", "Dorothy", "Steven", "Sandra",
+                      "Paul", "Ashley", "Andrew", "Kimberly", "Joshua", "Donna", "Kenneth", "Emily", "Kevin", "Michelle",
+                      "Brian", "Amanda", "George", "Melissa", "Edward", "Deborah", "Ronald", "Stephanie", "Timothy", "Rebecca",
+                      "Jason", "Laura", "Jeffrey", "Sharon", "Ryan", "Cynthia", "Jacob", "Kathleen", "Gary", "Amy",
+                      "Nicholas", "Shirley", "Eric", "Angela", "Jonathan", "Helen", "Stephen", "Anna", "Larry", "Brenda"]
+        
+        last_names = ["Smith", "Johnson", "Williams", "Jones", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor",
+                     "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson",
+                     "Clark", "Rodriguez", "Lewis", "Lee", "Walker", "Hall", "Allen", "Young", "Hernandez", "King",
+                     "Wright", "Lopez", "Hill", "Scott", "Green", "Adams", "Baker", "Gonzalez", "Nelson", "Carter",
+                     "Mitchell", "Perez", "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins",
+                     "Stewart", "Sanchez", "Morris", "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy", "Bailey",
+                     "Rivera", "Cooper", "Richardson", "Cox", "Howard", "Ward", "Torres", "Peterson", "Gray", "Ramirez"]
+        
+        # Generate a random name
+        random_first = random.choice(first_names)
+        random_last = random.choice(last_names)
+        
+        # Make sure we don't use a first name that's already in the cache
+        while random_first in self.first_name_cache:
+            random_first = random.choice(first_names)
+        
+        random_name = f"{random_first} {random_last}"
+        
+        # Add to cache
+        self.name_cache.add(random_name)
+        self.first_name_cache.add(random_first)
+        
+        # Generate a generic title based on the persona
+        title = "Professional"
+        if "teacher" in base_persona.lower() or "education" in base_persona.lower():
+            title = "Educator"
+        elif "engineer" in base_persona.lower() or "developer" in base_persona.lower():
+            title = "Tech Professional"
+        elif "market" in base_persona.lower():
+            title = "Marketing Specialist"
+        elif "business" in base_persona.lower():
+            title = "Business Owner"
+        elif "student" in base_persona.lower():
+            title = "Student"
+        
+        return {
+            "name": random_name,
+            "title": title,
+            "base_persona": base_persona
+        }
 
 def main():
     generator = PersonaGenerator()
