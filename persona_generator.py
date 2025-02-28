@@ -450,7 +450,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
                 return {
                     "name": name,
                     "title": title,
-                    "base_persona": restated_persona  # Include the restated persona instead of original
+                    "base_persona": base_persona  # Include the original base_persona instead of restated
                 }
             except Exception as e:
                 logger.error(f"Error generating name and title: {str(e)}")
@@ -521,7 +521,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         self.name_cache.add(random_name)
         self.first_name_cache.add(random_first)
         
-        # Generate a generic title based on the persona
+        # Generate a generic title based on the original persona
         title = "Professional"
         if "teacher" in base_persona.lower() or "education" in base_persona.lower():
             title = "Educator"
@@ -537,7 +537,7 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
         return {
             "name": random_name,
             "title": title,
-            "base_persona": restated_persona  # Include the restated persona instead of original
+            "base_persona": base_persona  # Include the original base_persona
         }
         
     def _restate_persona(self, base_persona):
