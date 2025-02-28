@@ -50,6 +50,10 @@ class ExpandPersonaRequest(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
 
+class NameRequest(BaseModel):
+    base_persona: str
+    restate: Optional[bool] = False
+
 @app.post("/generate", response_model=PersonaResponse)
 async def generate_persona(request: PersonaRequest, api_key: str = Depends(verify_api_key)):
     try:
@@ -98,7 +102,7 @@ async def get_random_name(api_key: str = Depends(verify_api_key)):
             raise HTTPException(status_code=503, detail="No personas available")
         
         random_persona = random.choice(personas)
-        name_response = generator.generate_name(random_persona)
+        name_response = generator.generate_name(random_persona, restate=False)
         
         if not name_response or 'name' not in name_response:
             raise HTTPException(status_code=500, detail="Failed to generate name")
@@ -106,6 +110,24 @@ async def get_random_name(api_key: str = Depends(verify_api_key)):
         return name_response
     except Exception as e:
         logging.error(f"Error generating random name: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/name-with-restate", response_model=NameResponse)
+async def get_name_with_restate(api_key: str = Depends(verify_api_key)):
+    """Generate a random name based on a random base persona with restatement"""
+    try:
+        if not personas or len(personas) == 0:
+            raise HTTPException(status_code=503, detail="No personas available")
+        
+        random_persona = random.choice(personas)
+        name_response = generator.generate_name(random_persona, restate=True)
+        
+        if not name_response or 'name' not in name_response:
+            raise HTTPException(status_code=500, detail="Failed to generate name")
+            
+        return name_response
+    except Exception as e:
+        logging.error(f"Error generating name with restate: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/expand-persona", response_model=PersonaResponse)
@@ -131,6 +153,23 @@ async def expand_persona(request: ExpandPersonaRequest, api_key: str = Depends(v
         return {"ux_persona": ux_persona}
     except Exception as e:
         logging.error(f"Error expanding persona: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/generate-name", response_model=NameResponse)
+async def generate_name(request: NameRequest, api_key: str = Depends(verify_api_key)):
+    """Generate a name based on a provided persona with optional restatement"""
+    try:
+        if not request.base_persona:
+            raise HTTPException(status_code=400, detail="Base persona is required")
+        
+        name_response = generator.generate_name(request.base_persona, restate=request.restate)
+        
+        if not name_response or 'name' not in name_response:
+            raise HTTPException(status_code=500, detail="Failed to generate name")
+            
+        return name_response
+    except Exception as e:
+        logging.error(f"Error generating name: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/health")
