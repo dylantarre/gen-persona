@@ -316,6 +316,57 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
             
             # Add a note about uniqueness without banning specific names
             template += "IMPORTANT: Please be creative and generate a truly unique name. The system has already generated many names, so try to create something fresh and different.\n\n"
+            template += "NOTE: The name 'Anya' has been used too frequently. Please avoid this name and create something different.\n\n"
+            
+            # Add extensive examples of diverse American names to inspire variety
+            template += "Here are examples of diverse American names for inspiration (DO NOT use these exact names, create new ones):\n\n"
+            
+            # Common American names
+            template += "Common American names:\n"
+            template += "- James Wilson, Emma Taylor, Michael Anderson, Sophia Thomas\n"
+            template += "- David Jackson, Jennifer White, Robert Harris, Linda Martin\n"
+            template += "- William Thompson, Elizabeth Garcia, Richard Martinez, Patricia Robinson\n\n"
+            
+            # Hispanic/Latino American names
+            template += "Hispanic/Latino American names:\n"
+            template += "- Miguel Diaz, Sofia Fernandez, Carlos Flores, Isabella Gomez\n"
+            template += "- Jose Gutierrez, Elena Hernandez, Luis Lopez, Gabriela Martinez\n"
+            template += "- Antonio Morales, Valentina Ortiz, Francisco Perez, Camila Ramirez\n\n"
+            
+            # Asian American names
+            template += "Asian American names:\n"
+            template += "- Wei Zhang, Mei Chen, Li Liu, Jing Wang\n"
+            template += "- Hiroshi Tanaka, Yuki Suzuki, Takashi Yamamoto, Sakura Nakamura\n"
+            template += "- Sanjay Gupta, Priya Sharma, Raj Patel, Lakshmi Desai\n"
+            template += "- Jin Park, Min Lee, Seung Choi, Ji Kang\n\n"
+            
+            # Middle Eastern/North African American names
+            template += "Middle Eastern/North African American names:\n"
+            template += "- Omar Ali, Fatima Khan, Ali Ahmed, Leila Hassan\n"
+            template += "- Mohammed Ibrahim, Yasmin Mahmoud, Ahmed Abadi, Nadia El-Amin\n\n"
+            
+            # African American names
+            template += "African American names:\n"
+            template += "- Jamal Washington, Keisha Jefferson, Darnell Banks, Latoya Booker\n"
+            template += "- Tyrone Coleman, Shaniqua Dixon, DeAndre Freeman, Imani Gaines\n\n"
+            
+            # European American names
+            template += "European American names:\n"
+            template += "- Giovanni Rossi, Isabella Bianchi, Dmitri Ivanov, Natasha Petrov\n"
+            template += "- Hans Muller, Ingrid Weber, Pierre Dubois, Sophie Moreau\n\n"
+            
+            # Jewish American names
+            template += "Jewish American names:\n"
+            template += "- Ari Cohen, Rachel Goldberg, Moshe Friedman, Leah Shapiro\n"
+            template += "- Eli Levy, Sarah Katz, Isaac Stern, Rebecca Rosen\n\n"
+            
+            # Native American names
+            template += "Native American names:\n"
+            template += "- Koda Blackhawk, Aiyana Eagleheart, Bodaway Redhorse, Halona Thundercloud\n\n"
+            
+            # Pacific Islander American names
+            template += "Pacific Islander American names:\n"
+            template += "- Kekoa Kalani, Leilani Kealoha, Keanu Mahelona, Moana Nainoa\n\n"
             
             template += "Return your response in this exact format:\n"
             template += "Name: [Full Name]\n"
@@ -341,7 +392,8 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
                     headers=self.headers,
                     json={
                         "model": "google/gemini-2.0-flash-001",
-                        "messages": messages
+                        "messages": messages,
+                        "temperature": 0.9  # Add temperature to increase randomness
                     }
                 )
                 response.raise_for_status()
