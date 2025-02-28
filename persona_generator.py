@@ -543,14 +543,14 @@ IMPORTANT: Your response MUST include ALL of the fields shown above. Make sure t
     def _restate_persona(self, base_persona):
         """Restate the base persona with different phrasing but same meaning"""
         # Use the API to restate the persona
-        template = "Restate the following persona description using different phrasing but keeping the exact same meaning. Make sure to preserve all key details about age, profession, characteristics, and other important information:\n\n"
+        template = "Restate the following persona description in a single, natural sentence that a UX researcher might jot down in their notes. Keep the same meaning and all key details about age, profession, and characteristics:\n\n"
         template += base_persona
-        template += "\n\nIMPORTANT: Return ONLY the restated description without any prefacing text like 'Here's a restatement...' or 'This is a rephrased version...'. Write it as if you are a UX researcher taking notes on this person. The response should start directly with the restated description."
+        template += "\n\nIMPORTANT: Your response should be ONLY ONE SENTENCE. No prefacing text, no explanations, no bullet points. Write it as a human would naturally take a quick note. Start directly with the restated description."
         
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert UX researcher who rephrases persona descriptions in a natural, conversational tone. You restate information using different words and sentence structures, but you never add or remove any key details. You always return only the restated description without any prefacing text."
+                "content": "You are a UX researcher who takes concise, natural notes. You restate information in a single sentence that sounds like something a human would write in their notebook. You never add prefacing text or explanations."
             },
             {
                 "role": "user",
