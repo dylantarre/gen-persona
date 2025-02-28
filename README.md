@@ -131,7 +131,73 @@ curl -X GET "https://gen.kolidos.com/random-name" \
 ```json
 {
     "name": "Sarah Jane Wilson",
+    "title": "Marketing Manager",
     "base_persona": "A 35-year-old marketing manager who struggles with work-life balance."
+}
+```
+
+> **Note:** This endpoint does not restate the base persona.
+
+### Get a Random Name with Restated Persona
+
+**Endpoint:** `GET https://gen.kolidos.com/name-with-restate`
+
+**Headers:**
+```
+X-API-Key: your_api_secret_key
+```
+
+**Example Request:**
+```bash
+curl -X GET "https://gen.kolidos.com/name-with-restate" \
+     -H "X-API-Key: your_api_secret_key"
+```
+
+**Example Response:**
+```json
+{
+    "name": "Sarah Jane Wilson",
+    "title": "Marketing Manager",
+    "base_persona": "Ambitious marketing professional juggling career demands and personal life."
+}
+```
+
+> **Note:** This endpoint restates the base persona to be more concise and human-like.
+
+### Generate a Name from Custom Persona
+
+**Endpoint:** `POST https://gen.kolidos.com/generate-name`
+
+**Headers:**
+```
+Content-Type: application/json
+X-API-Key: your_api_secret_key
+```
+
+**Request Body:**
+```json
+{
+    "base_persona": "A 42-year-old software architect who specializes in cloud infrastructure",
+    "restate": true
+}
+```
+
+> **Note:** The `restate` field is optional and defaults to `false`. When set to `true`, the base persona will be restated to be more concise and human-like.
+
+**Example Request:**
+```bash
+curl -X POST "https://gen.kolidos.com/generate-name" \
+     -H "Content-Type: application/json" \
+     -H "X-API-Key: your_api_secret_key" \
+     -d '{"base_persona": "A 42-year-old software architect who specializes in cloud infrastructure", "restate": true}'
+```
+
+**Example Response:**
+```json
+{
+    "name": "Michael Chen",
+    "title": "Cloud Solutions Architect",
+    "base_persona": "Experienced tech professional focused on cloud architecture solutions."
 }
 ```
 
